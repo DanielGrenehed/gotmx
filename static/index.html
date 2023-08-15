@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="htmx"></script>
+		<link src="css" rel="stylesheet">
+		<title>Gottp</title>
+	</head>
+	<body>
+		<form hx-post="create_task" hx-target="#tasks">
+			<input type="text" name="task"></input>
+		</form>
+		<div id="tasks"></div>
+	</body>
+</html>
