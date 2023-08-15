@@ -92,6 +92,8 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			} else {
+				task.Created = strings.ReplaceAll(task.Created, "T", " ")
+				task.Created = strings.ReplaceAll(task.Created, "Z", " ")
 				html_templates["task"](task, w)
 			}
 		}
@@ -99,11 +101,13 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func postCreateTask(w http.ResponseWriter, r *http.Request) {
-	q, err := db.Prepare("INSERT INTO tasks(task, completed) VALUES(?,?);")
-	if err != nil {fmt.Println(err)}
-	_, err = q.Exec(r.FormValue("task"), "false")
-	if err != nil {fmt.Println(err)}
-
+	tsk := strings.TrimSpace(r.FormValue("task"))
+	if len(tsk) != 0 {
+		q, err := db.Prepare("INSERT INTO tasks(task, completed) VALUES(?,?);")
+		if err != nil {fmt.Println(err)}
+		_, err = q.Exec(tsk, "false")
+		if err != nil {fmt.Println(err)}
+	}
 	getTasks(w,r)
 }
 

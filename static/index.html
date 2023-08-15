@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;1,100&family=Roboto+Mono:wght@100;300&display=swap" rel="stylesheet">
 		<script src="htmx"></script>
+
 		<link href="css" rel="stylesheet">
 		<title>Gottp</title>
 	</head>
 	<body>
-		<form hx-post="create_task" hx-target="#tasks"  hx-on::after-request="this.reset()">
-			<input type="text" name="task"></input>
-			<button>Create task</button>
+		<form id="task_create_form" hx-post="create_task" hx-target="#tasks"  hx-on::after-request="this.reset()">
+			<input type="text" name="task" placeholder="Create task"></input>
+			<button>Create</button>
 		</form>
 		<div id="tasks" hx-get="tasks" hx-trigger="load"></div>
 	</body>
