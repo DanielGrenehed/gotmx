@@ -2,4 +2,5 @@
 	<button class="complete_task_btn" hx-get="complete_task?task_id={{.Id}}" hx-target="#task_id_{{.Id}}" hx-swap="outerHTML">X</button>
 	<p class="task_text">{{.Task}}</p>
 	<p class="task_created">{{.Created}}</p>
+	<p class="{{.Completed}} complete_task">{{.Completed}}</p>
 </div>

@@ -10,10 +10,21 @@
 		<title>Gottp</title>
 	</head>
 	<body>
-		<form id="task_create_form" hx-post="create_task" hx-target="#tasks"  hx-on::after-request="this.reset()">
-			<input type="text" name="task" placeholder="Create task"></input>
-			<button>Create</button>
-		</form>
-		<div id="tasks" hx-get="tasks" hx-trigger="load"></div>
+		<div class="split_container">
+			<div id="active_tasks">
+				<form id="task_create_form" hx-post="create_task" hx-target="#tasks"  hx-on::after-request="this.reset()">
+					<input type="text" name="task" placeholder="Create task"></input>
+					<button>Create</button>
+				</form>
+				<div id="tasks" hx-get="tasks" hx-trigger="load"></div>	
+			</div>
+			<div id="task_search">
+				<input id="task_search_input" class="form-control" type="text" name="search" placeholder="Search"	
+					hx-post="/tasks" 
+					hx-target="#search_tasks" 
+					hx-trigger="keyup changed delay:300ms, search"></input>
+				<div id="search_tasks"></div>
+			</div>
+		</div>
 	</body>
 </html>

@@ -43,12 +43,12 @@ button {
 	outline: 4px solid var(--color-almond);
 }
 
-#task_create_form {
+form {
 	max-width: calc(400px+2*1rem);
 	padding: 10px;
 }
 
-#task_create_form > input {
+form > input {
 	background: var(--color-violet-jtc);
 	color: var(--color-almond);
 	border: 0;
@@ -58,7 +58,7 @@ button {
 	font-size: 1.25rem;
 	padding: 1rem;
 }
-#task_create_form > button {
+form > button {
 	background: var(--color-violet-jtc);
 	color: var(--color-almond);
 	border: 0;
@@ -67,6 +67,25 @@ button {
 	font-size: calc(1.35rem);
 }
 
+#task_search_input {
+	background: var(--color-violet-jtc);
+	color: var(--color-almond);
+	border: 0;
+	width: 400px;
+	border-radius: 10px;
+	font-family: "Roboto Mono", monospace;
+	font-size: 1.25rem;
+	padding: 1rem;
+	margin: 10px;
+}
+.split_container {
+	display: grid;
+	grid-template:auto/ 1fr 1fr;
+}
+
+.false {
+	display:none;
+}
 .task {
 	background: var(--color-violet-jtc);
 	color: var(--color-almond);

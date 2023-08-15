@@ -80,23 +80,46 @@ type T_task struct {
 	Completed string
 }
 
+func respondTaskQuery(w http.ResponseWriter, rows *sql.Rows) {
+	var task T_task
+	for rows.Next() {
+		err := rows.Scan(&task.Id, &task.Task, &task.Created, &task.Completed)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			task.Created = strings.ReplaceAll(task.Created, "T", " ")
+			task.Created = strings.ReplaceAll(task.Created, "Z", " ")
+			html_templates["task"](task, w)
+		}
+	}
+}
+
 func getTasks(w http.ResponseWriter, r *http.Request) {
-	rows,err := db.Query("SELECT * FROM tasks WHERE completed='false' ORDER BY id DESC;")
-	if err != nil {
-		fmt.Println(err)
-		fmt.Fprintf(w, "<h2>Currenttly no tasks</h2>")
-	} else {
-		var task T_task
-		for rows.Next() {
-			err = rows.Scan(&task.Id, &task.Task, &task.Created, &task.Completed)
+	sparams := strings.TrimSpace(r.FormValue("search"))
+	if len(sparams) > 0 {
+		q, err := db.Prepare("SELECT * FROM tasks WHERE task LIKE '%' || ? || '%' ORDER BY id DESC;")
+		if err != nil {
+			fmt.Println(err)
+			fmt.Fprintf(w, "<h2>Currently no tasks</h2>")
+		} else {
+			rows, err := q.Query(sparams)
 			if err != nil {
 				fmt.Println(err)
+				fmt.Fprintf(w, "<h2>Currently no tasks</h2>")
 			} else {
-				task.Created = strings.ReplaceAll(task.Created, "T", " ")
-				task.Created = strings.ReplaceAll(task.Created, "Z", " ")
-				html_templates["task"](task, w)
+				respondTaskQuery(w, rows)
 			}
 		}
+	} else {
+		rows,err := db.Query("SELECT * FROM tasks WHERE completed='false' ORDER BY id DESC;")
+		defer rows.Close()
+		if err != nil {
+			fmt.Println(err)
+			fmt.Fprintf(w, "<h2>Currenttly no tasks</h2>")
+		} else {
+			respondTaskQuery(w, rows)
+		}
+
 	}
 }
 
