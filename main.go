@@ -80,6 +80,24 @@ type T_task struct {
 	Completed string
 }
 
+func loadTasks(w http.ResponseWriter, r *http.Request) {
+	rows,err := db.Query("SELECT * FROM tasks WHERE completed='false';")
+	if err != nil {
+		fmt.Println(err)
+		fmt.Fprintf(w, "<h2>Currenttly no tasks</h2>")
+	} else {
+		var task T_task
+		for rows.Next() {
+			err = rows.Scan(&task.Id, &task.Task, &task.Created, &task.Completed)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				html_templates["task"](task, w)
+			}
+		}
+	}
+}
+
 func postCreateTask(w http.ResponseWriter, r *http.Request) {
 	// create task and return all active tasks
 	q, err := db.Prepare("INSERT INTO tasks(task, completed) VALUES(?,?);")
@@ -87,17 +105,17 @@ func postCreateTask(w http.ResponseWriter, r *http.Request) {
 	_, err = q.Exec(r.FormValue("task"), "false")
 	if err != nil {fmt.Println(err)}
 
+	loadTasks(w,r)
+	/*
 	rows, err := db.Query("SELECT * FROM tasks WHERE completed = 'false';")
 	
 	if err != nil {
 		fmt.Println(err)
-		fmt.Fprintf(w, "Currently unavaliable")
+		fmt.Fprintf(w, "<h2>Currently no tasks</h2>")
 	} else {
 		var task T_task
 		for rows.Next() {
 			err = rows.Scan(&task.Id, &task.Task, &task.Created, &task.Completed)
-			
-			fmt.Println(task)
 			
 			if err != nil {
 				fmt.Println(err)
@@ -105,7 +123,7 @@ func postCreateTask(w http.ResponseWriter, r *http.Request) {
 			html_templates["task"](task, w)
 			
 		}
-	}
+	}*/
 }
 
 func postCompleteTask(w http.ResponseWriter, r *http.Request) {
@@ -133,5 +151,6 @@ func main() {
 	fmt.Println("Server starting!")
 	http.HandleFunc("/create_task", postCreateTask)
 	http.HandleFunc("/complete_task", postCompleteTask)
+	http.HandleFunc("/tasks", loadTasks)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }

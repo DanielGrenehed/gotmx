@@ -6,9 +6,10 @@
 		<title>Gottp</title>
 	</head>
 	<body>
-		<form hx-post="create_task" hx-target="#tasks">
+		<form hx-post="create_task" hx-target="#tasks"  hx-on::after-request="this.reset()">
 			<input type="text" name="task"></input>
+			<button>Create task</button>
 		</form>
-		<div id="tasks"></div>
+		<div id="tasks" hx-get="tasks" hx-trigger="load"></div>
 	</body>
 </html>
