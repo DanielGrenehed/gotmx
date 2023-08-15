@@ -14,12 +14,15 @@ import (
 
 var db, db_err = sql.Open("sqlite3", "foo.db")
 
-type HTMLTemplate func(any, http.ResponseWriter) error
+type HTMLTemplate func(any, http.ResponseWriter)
 
 func GenerateTemplate(f string) (HTMLTemplate) {
 	temp, err := template.ParseFiles(f)
 	if err != nil {fmt.Println(err)}
-	return func(s any, r http.ResponseWriter) error {return temp.Execute(r, s)}
+	return func(s any, r http.ResponseWriter) { 
+		err := temp.Execute(r, s)
+		if err != nil {fmt.Println(err)}
+	}
 }
 var html_templates = make(map[string]HTMLTemplate)
 
@@ -84,7 +87,7 @@ func postCreateTask(w http.ResponseWriter, r *http.Request) {
 	_, err = q.Exec(r.FormValue("task"), "false")
 	if err != nil {fmt.Println(err)}
 
-	rows, err := db.Query("SELECT * FROM tasks;")
+	rows, err := db.Query("SELECT * FROM tasks WHERE completed = 'false';")
 	
 	if err != nil {
 		fmt.Println(err)
@@ -105,6 +108,14 @@ func postCreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func postCompleteTask(w http.ResponseWriter, r *http.Request) {
+	q, err := db.Prepare("UPDATE tasks SET completed = CURRENT_TIMESTAMP WHERE completed ='false' AND id = ?")
+	if err != nil {fmt.Println(err)}
+	_, err = q.Exec(r.FormValue("task_id"))
+	if err != nil {fmt.Println(err)}
+	fmt.Fprintf(w, "")
+}
+
 func main() {
 	var port int
 	flag.IntVar(&port,"p",8080,"port to run on")
@@ -121,5 +132,6 @@ func main() {
 
 	fmt.Println("Server starting!")
 	http.HandleFunc("/create_task", postCreateTask)
+	http.HandleFunc("/complete_task", postCompleteTask)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }

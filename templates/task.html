@@ -1,1 +1,5 @@
-<div class="{{.Id}}"><h2>This Is A {{.Task}} Element!</h2></div>
+<div class="task_id_{{.Id}}">
+	<h2>{{.Task}}</h2>
+	<p>{{.Created}}</p>
+	<button hx-get="complete_task?task_id={{.Id}}" hx-target=".task_id_{{.Id}}">Complete</button>
+</div>
