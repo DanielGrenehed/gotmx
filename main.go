@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"flag"
 	"net/http"
-	"html/template"
 	"strconv"
-	"os"
 	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,16 +12,6 @@ import (
 
 var db, db_err = sql.Open("sqlite3", "foo.db")
 
-type HTMLTemplate func(any, http.ResponseWriter)
-
-func GenerateTemplate(f string) (HTMLTemplate) {
-	temp, err := template.ParseFiles(f)
-	if err != nil {fmt.Println(err)}
-	return func(s any, r http.ResponseWriter) { 
-		err := temp.Execute(r, s)
-		if err != nil {fmt.Println(err)}
-	}
-}
 var html_templates = make(map[string]HTMLTemplate)
 
 func LoadTemplates() {
@@ -31,34 +19,7 @@ func LoadTemplates() {
 	html_templates["default"] = GenerateTemplate("templates/index.html")
 }
 
-type StaticResource struct {
-	Content string
-	MimeType string
-}
-
 var static_content = make(map[string]StaticResource)
-
-func getMimeType(f string) string {
-	if strings.HasSuffix(f, ".css") {return "text/css"}
-	if strings.HasSuffix(f, ".js") {return "text/javascript"}
-	return "text/html"
-}
-
-func LoadStaticFile(f string) StaticResource {
-	content, err := os.ReadFile(f)
-	if err != nil {fmt.Println(err)}
-	resource := StaticResource{Content: string(content[:]), MimeType: getMimeType(f)}
-	return resource
-}
-
-type StaticBind func(http.ResponseWriter, *http.Request)
-
-func getBindResource(res StaticResource) StaticBind {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", res.MimeType)
-		fmt.Fprintf(w, res.Content)
-	}	
-}
 
 func LoadStaticFiles() {
 	static_content["htmx"] = LoadStaticFile("static/htmx.min.js")
